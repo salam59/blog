@@ -1,0 +1,13 @@
+_pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+db.sqlite3
+*.db
+# Django migrations
+*/migrations/
+Lib/
+Scripts/
+
+.env

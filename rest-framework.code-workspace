@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.autoSave": "afterDelay",
+		"python.analysis.diagnosticSeverityOverrides": {
+			"python.linting.pep8Enabled": true,
+			"python.linting.pylintEnabled": true
+		}
+	}
+}
