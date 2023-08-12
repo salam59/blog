@@ -2,29 +2,31 @@ from django.shortcuts import render
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 from quickstart.models import Article
 from quickstart.serializers import ArticleSerializer
 # Create your views here.
 
-@csrf_exempt
+@api_view(['GET','POST'])
 def article_list(request):
 
     if request.method == "GET":
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles,many=True)
-        return JsonResponse(serializer.data,safe=False)
+        return Response(serializer.data)
     
     if request.method == "POST":
-        data = JSONParser().parse(request) 
-        serializer = ArticleSerializer(data=data)
+        serializer = ArticleSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
-            return HttpResponse("Success",status=201)
-        return JsonResponse(serializer.errors,status=400)
+            return HttpResponse("Success",status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
+@api_view(['GET','PUT','DELETE'])
 def article_details(request,id):
 
     try:
@@ -35,20 +37,19 @@ def article_details(request,id):
     if request.method == "GET":
 
         serialize = ArticleSerializer(article,many=False)
-        return JsonResponse(serialize.data,status=401)
+        return Response(serialize.data,status=status.HTTP_202_ACCEPTED)
     
     elif request.method == "PUT": #UPDATE
 
-        data = JSONParser().parse(request)
-        serialize = ArticleSerializer(article,data=data)
+        serialize = ArticleSerializer(article,data=request.data)
 
         if serialize.is_valid():
             serialize.save()
-            return HttpResponse("Successfully updated",status=201)
-        return JsonResponse(serialize.errors,status=400) # if the serialized data doesn't match models fields
+            return HttpResponse("Successfully updated",status=status.HTTP_201_CREATED)
+        return Response(serialize.errors,status=status.HTTP_400_BAD_REQUEST) # if the serialized data doesn't match models fields
     
     elif request.method == "DELETE":
         article.delete()
-        return HttpResponse("Successfully DELETED",status=204)
+        return Response("Successfully DELETED",status=status.HTTP_202_ACCEPTED)
     elif request.method == "POST":
-        return HttpResponse("POST Not allowed in this URL. Try with /articles")
+        return Response("POST Not allowed in this URL. Try with /articles")
